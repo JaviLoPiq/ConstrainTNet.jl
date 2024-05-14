@@ -1,0 +1,32 @@
+Copyright (c) 
+  2024-- Javier Lopez Piqueres, jlopezpiquer@umass.edu 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software solely for non-commercial research purposes, except as provided below. 
+This license applies to all versions of the Software, including new versions or updates, 
+unless such versions are accompanied by a separate license.
+
+The term "non-commercial research" refers to research activities which are not
+undertaken for profit, or which are not part of a commercial enterprise or initiative.
+The following conditions apply:
+
+- All copies or substantial portions of the Software must include the above copyright
+  notice and this permission notice.
+- Modifications and use of the Software are permitted for non-commercial research, but
+  redistributing modified versions or commercial exploitation of the Software requires
+  explicit permission from the authors, except where such use is by the authors themselves.
+
+- The Software includes components licensed under the Apache License, Version 2.0 (the "Apache License").
+  These components are provided under the Apache License, and the use of these components is subject to the terms
+  and conditions of the Apache License. A copy of the Apache License is included with these components and is also
+  available at http://www.apache.org/licenses/LICENSE-2.0.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+For inquiries regarding commercial use, please contact the authors to discuss and negotiate specific licensing terms.
