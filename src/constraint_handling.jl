@@ -90,7 +90,6 @@ function constraints_to_indices(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}
             for j in eachindex(link_indices_backward[i])
                 num_boxes += length(link_indices_backward[i][j].boxes)
             end 
-            @show i, num_qregions, num_boxes
             if num_qregions > max_num_qregions 
                 max_num_qregions = num_qregions
             end
@@ -194,9 +193,15 @@ output :
 - link indices that assign mps flux at first site. 
 - link indices that assign mps flux at last site. 
 - max number of qregions found during backward sweep.
+
+Args : 
+- flux_center: flux position 
+- block_dim: block dim of each tensor 
+- verbose: if true dynamically prints out site indices during backward/forward sweeps  
+- ensemble_entries: ensemble distribution of entries. Default to all tensor entries constant and equal to 1 
 """
 
-function constraints_to_mps(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}; flux_center=1, verbose=false, block_dim=1)
+function constraints_to_mps(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}; flux_center=1, verbose=false, block_dim=1, ensemble_entries="constant")
     m, N = size(A)
 
     results_forward = Threads.@spawn constraints_to_indices(A, lb, ub; verbose=verbose)
@@ -215,14 +220,10 @@ function constraints_to_mps(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}; fl
     link_inds_forward = Vector{Index}()
     link_inds_backward = Vector{Index}()
     for j in 1:N-1 
-        #a = map(i -> link_indices_forward[j][i] => block_dim, eachindex(link_indices_forward[j])) 
-        #@show Index(map(i -> link_indices_forward[j][i] => block_dim, eachindex(link_indices_forward[j])))
-        #error("hi")
         push!(link_inds_forward, Index(map(i -> link_indices_forward[j][i] => block_dim, eachindex(link_indices_forward[j]))))
         push!(link_inds_backward, Index(map(i -> link_indices_backward[j][i] => block_dim, eachindex(link_indices_backward[j]))))
     end
 
-    @show typeof(link_inds_forward[1]), link_inds_forward[1]
     for j in 1:N-1
         if j < flux_center
             push!(link_inds, link_inds_forward[j]) 
@@ -272,12 +273,16 @@ function constraints_to_mps(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}; fl
         v[N] = randITensor((dag(site_inds[N]),link_inds[N-1]), blocks[N])
     end
 
-    #rand!(v[flux_center].tensor.storage.data) # assign uniformly random entries
+    if ensemble_entries == "constant" # assign all entries to 1 (default)
+        for i in 1:N 
+            fill!(v[i].tensor.storage.data, 1.0)
+        end
+    elseif ensemble_entries == "uniform" # assign entries uniformly random
+        for i in 1:N 
+            rand!(v[i].tensor.storage.data)
+        end
+    end 
 
-    # TODO : give option to initialize with uniform entries vs random
-    for i in 1:N 
-        fill!(v[i].tensor.storage.data, 1.0)
-    end
     mps = MPS(v)
 
     return mps, link_inds_backward, link_inds_forward, max_num_qregions

@@ -19,7 +19,6 @@ include("constrained_optimization.jl")
 # ITensors exports 
 export Box, QRegion, sample!, normalize!
 # ConstrainTNet exports 
-export constraints_to_mps, constrained_orthogonalize!, optimizer, quadratic_cost_function
-# TODO : add exports
+export constraints_to_mps, constrained_orthogonalize!, optimizer, quadratic_cost_function, training, TrainParams
 
 end

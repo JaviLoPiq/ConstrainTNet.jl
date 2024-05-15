@@ -1,8 +1,3 @@
-using Revise, Random, ProfileView
-include("constraint_handling.jl")
-include("constrained_mps.jl")
-include("constrained_optimization.jl")
-
 function run_job(seed)
     N = 100
 
@@ -33,5 +28,5 @@ for i in 1:eachindex(seeds)
     @time results[i] = run_job(seeds[i])
 end
 
-using Serialization
-serialize("results_N_100.jls", results)
+#using Serialization
+#serialize("results_N_100.jls", results)
