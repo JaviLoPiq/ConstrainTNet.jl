@@ -1,7 +1,5 @@
 module ConstrainTNet
 
-#include("ITensors.jl/src/ITensors.jl")
-#using .ITensors
 
 using NDTensors
 using NDTensors: setblock!, Block, Blocks, DiagMatrix, getdiagindex, BlockSparseMatrix
