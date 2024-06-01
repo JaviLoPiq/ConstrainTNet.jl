@@ -1,5 +1,4 @@
 using JuMP, SCIP, Random
-using LinearAlgebra
 
 function run_job_scip(seed)
     N = 100
@@ -61,7 +60,7 @@ end
 
 seeds = [1, 2, 3, 4, 5]
 
-for i in 1:eachindex(seeds)
+for i in eachindex(seeds)
     println("seed: ", i)
     run_job_scip(seeds[i])
 end

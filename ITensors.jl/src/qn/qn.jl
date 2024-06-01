@@ -89,18 +89,6 @@ struct QN <: QNRegion
   QN(s::QNStorage) = new(s)
 end
 
-#=
-struct QN
-  data::QNStorage
-
-  function QN()
-    s = QNStorage(ntuple(_ -> ZeroVal, Val(maxQNs)))
-    return new(s)
-  end
-
-  QN(s::QNStorage) = new(s)
-end
-=#
 QN(mqn::MQNStorage) = QN(QNStorage(mqn))
 QN(mqn::NTuple{N,QNVal}) where {N} = QN(QNStorage(mqn))
 

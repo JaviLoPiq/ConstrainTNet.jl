@@ -225,14 +225,13 @@ function optimizer(cost_function, A::Matrix{Int}, lb::Vector{Int}, ub::Vector{In
     N = length(mps)
     learning_rate::Float32 = get(kwargs, :learning_rate, Float32(0.5E-1))
     num_training_steps::Int = get(kwargs, :num_training_steps, 1)
+    train_params = TrainParams(learning_rate, num_training_steps)
     dict_samples = Dict{Vector{Int}, Float64}()
     history_costs = Vector{Vector{Union{Int,Float64}}}()
     total_data_samples = Set{Vector{Int}}()
-    seed_samples = Vector{Vector{Int}}()
     new_costs = Vector{Union{Int,Float64}}()
     for _ in 1:num_train_samples 
         seed_sample = sample(mps) .- 1 
-        push!(seed_samples, seed_sample)
         push!(total_data_samples, seed_sample)
         push!(new_costs, cost_function(seed_sample))
     end
@@ -241,14 +240,9 @@ function optimizer(cost_function, A::Matrix{Int}, lb::Vector{Int}, ub::Vector{In
     min_old_costs = 0
     for i in 1:num_loops 
         println("Loop ", i, " minimum so far ", cum_minimum)
-        sorted_costs = sort([cost_function(v) for v in seed_samples])
-        #temperature = 500/i # N = 200
-        #temperature = 1000/i # N = 400 
-        #temperature = 250/i # N = 100
-        temperature = 125/i # N = 50
+        temperature = 2.5N/i 
         dict_samples = boltzmann_probabilities(cost_function, collect(total_data_samples), temperature)
         training_samples = extract_training_samples(dict_samples, num_train_samples, N)
-        train_params = TrainParams(learning_rate, num_training_steps)
         if i > 1 
             if minimum(new_costs) >= min_old_costs #cum_minimum  
                 rows_to_delete = randperm(size(training_samples, 1))[1:Int(0.1*num_train_samples)]
@@ -267,10 +261,8 @@ function optimizer(cost_function, A::Matrix{Int}, lb::Vector{Int}, ub::Vector{In
 
         min_old_costs = minimum(new_costs) 
         new_costs = Vector{Union{Int, Float64}}()
-        seed_samples = Vector{Vector{Int}}()
         for i in 1:num_train_samples 
             seed_sample = sample(mps) .- 1 
-            push!(seed_samples, seed_sample)
             push!(total_data_samples, seed_sample)
             push!(new_costs, cost_function(seed_sample))
         end

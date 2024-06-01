@@ -1,3 +1,4 @@
+using Random
 function run_job(seed)
     N = 100
 
@@ -23,7 +24,7 @@ end
 seeds = [1, 2, 3, 4, 5]
 results = Vector{Vector{Vector{Int64}}}(undef, length(seeds))
 
-for i in 1:eachindex(seeds)
+for i in eachindex(seeds)
     println("seed: ", i)
     @time results[i] = run_job(seeds[i])
 end

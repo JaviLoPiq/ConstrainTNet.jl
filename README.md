@@ -1,5 +1,7 @@
 # ConstrainTNet.jl
 
+Repository for the paper: ["Cons-training tensor networks"](https://arxiv.org/abs/2405.09005). 
+
 ConstrainTNet.jl requires a forked version of ITensors.jl from the `constraints` branch.
 
 ## Installation
@@ -10,7 +12,7 @@ To install ConstrainTNet.jl along with the forked version of ITensors.jl as a su
    ```bash
    git clone --recurse-submodules https://github.com/JaviLoPiq/ConstrainTNet.jl.git
 
-2. Open the Julia REPL and set up the environment:
+2. Open the Julia REPL within the repo and set up the environment:
     ```julia
     using Pkg
     Pkg.activate(".")
