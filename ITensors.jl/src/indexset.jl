@@ -660,7 +660,6 @@ end
 # integers in A and B means the corresponding index components should 
 # be contracted. E.g. (2, -1), (-1, 3) for two rank-2 tensors 
 function compute_contraction_labels(Ais::Tuple, Bis::Tuple)
-  #have_qns = true #hasqns(Ais) && hasqns(Bis) #TODO: come back to this
   have_qns = hasqns(Ais) && hasqns(Bis)
   NA = length(Ais)
   NB = length(Bis)
@@ -865,7 +864,6 @@ flux(is, Block(2, 2)) == QN(0)
 ```
 """
 
-# v2: seems to work
 function flux(inds::Indices, block::Block) :: Union{Nothing, QNRegion, Vector{QRegion}}
   qntot = QN()
   indx_qns = Int[]
@@ -930,91 +928,6 @@ function flux(inds::Indices, block::Block) :: Union{Nothing, QNRegion, Vector{QR
   return qntot
 end
 
-
-#= working version
-function flux(inds::Indices, block::Block)::Union{Nothing,QNRegion,Vector{QRegion}} # or QNRegion -> QN, QRegion?
-  qntot = QN()
-  indx_qns = []
-  indx_qregions = []
-  for n in 1:length(inds)
-    all_elements_QRegion = true 
-    for element in inds[n]
-      if !(typeof(qn(element)) <: QRegion)
-        all_elements_QRegion = false
-      end
-    end
-    if all_elements_QRegion == true
-      push!(indx_qregions, n)
-    else 
-      push!(indx_qns, n)
-    end 
-  end 
-
-  if length(indx_qregions) == 1 && length(inds) == 2 #bdry term
-    ind1 = indx_qregions[1]
-    ind2 = indx_qns[1]
-    fl1 = flux(inds[ind1], Block(block[ind1]))
-    fl2 = flux(inds[ind2], Block(block[ind2]))
-    if Int(dir(inds[ind1])) == -1 && Int(dir(inds[ind2])) == -1 #right bdry; assuming ortho center here
-      #mind the minus. Pictorially, the incoming QN index, usually from physical leg, comes with a minus in ITensor, so we need to counter it. Same below 
-      #TODO: is the construction also valid for physical indices going out?
-      return fl1 - fl2 
-    elseif Int(dir(inds[ind1])) == 1 && Int(dir(inds[ind2])) == -1 #left bdry; no ortho center here
-      if (-fl2 ⊂ fl1)  
-        return QN() 
-      end
-      return nothing 
-    end
-  end
-
-  if length(indx_qregions) == 2 && length(inds) == 2 
-    fl1 = flux(inds[1], Block(block[1]))
-    fl2 = flux(inds[2], Block(block[2]))
-    if typeof(fl1) <: QRegion && typeof(fl2) <: QRegion # TODO : is this not redundant?
-      return fl1 + fl2
-    else #TODO: what if fl1 is QRegion and not fl2, or viceversa. What's the meaning of this?
-      if is_intersect(fl1, fl2)
-        return QN(0)
-      else 
-        return nothing
-      end
-    end
-  end
-
-  if length(indx_qregions) == 2 && length(inds) == 3 
-    ind1, ind2 = indx_qregions[1], indx_qregions[2]
-    fl1 = flux(inds[ind1], Block(block[ind1]))
-    fl2 = flux(inds[ind2], Block(block[ind2]))
-    ind3 = indx_qns[1]
-    fl3 = flux(inds[ind3], Block(block[ind3])) 
-    if Int(dir(inds[ind1])) == -1 && Int(dir(inds[ind3])) == -1 && Int(dir(inds[ind2])) == 1
-      if is_intersect(fl1-fl3,fl2)
-        return QN(0)
-      else 
-        return nothing 
-      end
-    elseif Int(dir(inds[ind1])) == 1 && Int(dir(inds[ind3])) == -1 && Int(dir(inds[ind2])) == -1
-      if is_intersect(fl2-fl3,fl1)
-        return QN(0)
-      else 
-        return nothing 
-      end
-    # ortho center somewhere in the middle 
-    #TODO: what's up with left end   
-    #TODO: alternative to computing entire volume of QNs in two QRegions?
-    elseif Int(dir(inds[ind1])) == -1 && Int(dir(inds[ind3])) == -1 && Int(dir(inds[ind2])) == -1 
-      return fl1+fl2-fl3 # TODO : why -fl3? 
-    else
-      return nothing
-    end
-  end
-  for n in 1:length(inds)
-    ind = inds[n]
-    qntot += flux(ind, Block(block[n]))
-  end
-  return qntot
-end
-=#
 """
     flux(inds::Indices, I::Integer...)
 
