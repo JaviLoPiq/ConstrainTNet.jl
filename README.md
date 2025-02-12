@@ -27,3 +27,5 @@ To install ConstrainTNet.jl along with the forked version of ITensors.jl as a su
 3. Load ConstrainTNet.jl
     ```julia 
     using ConstrainTNet
+
+In case of questions or suggestions, please feel free to reach out at jlopezpiquer@umass.edu.  

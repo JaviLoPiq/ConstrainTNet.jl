@@ -108,7 +108,7 @@ function constraints_to_indices(A::Matrix{Int}, lb::Vector{Int}, ub::Vector{Int}
     end    
     qregion = interior(A[:,1], link_indices_backward[N])
     if qregion !== nothing 
-        if qregion ∉ new_index # TODO : check again 
+        if qregion ∉ new_index 
             push!(new_index, qregion)
             push!(blocks_site, Block(2,2))
         else 

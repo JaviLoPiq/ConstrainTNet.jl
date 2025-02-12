@@ -17,7 +17,7 @@ end
 
 (box1::Box == box2::Box) = isequal(box1, box2)
 
-function intersection(box1::Box, box2::Box)::Union{Box, Nothing}
+@inline function intersection(box1::Box, box2::Box)::Union{Box, Nothing}
     L1 = length(box1.min_corner)
     L2 = length(box2.min_corner)
     # Ensure the boxes are in the same dimension
@@ -179,17 +179,20 @@ struct QRegion <: QNRegion
 end
 
 function intersection(qregion1::QRegion, qregion2::QRegion)::Union{Nothing,QRegion}
-    qregion = Vector{Box}()
-    for i in eachindex(qregion1.boxes)
-        for j in eachindex(qregion2.boxes)
-            inter = qregion1.boxes[i] ∩ qregion2.boxes[j] 
-            if inter === nothing 
-                append!(qregion, [])
-            else
-                append!(qregion, [inter]) 
+    set1 = qregion1.boxes 
+    set2 = qregion2.boxes 
+    qregion = Vector{Box}(undef, length(set1)*length(set2))
+    count = 0
+    for i in 1:length(set1)
+        for j in 1:length(set2)
+            inter = set1[i] ∩ set2[j] 
+            if inter !== nothing    
+                count += 1
+                qregion[count] = inter
             end
         end 
     end 
+    resize!(qregion, count)
     if qregion != []
         return QRegion(qregion)
     else
@@ -198,19 +201,6 @@ function intersection(qregion1::QRegion, qregion2::QRegion)::Union{Nothing,QRegi
 end
 
 (qregion1::QRegion ∩ qregion2::QRegion) = intersection(qregion1, qregion2)
-
-function intersection_matrix(qregion1::QRegion, qregion2::QRegion)::Matrix{Union{Nothing,Box}}
-    len1 = length(qregion1.boxes)
-    len2 = length(qregion2.boxes)
-    inter = Matrix{Union{Nothing,Box}}(undef, len1, len2)
-    for i in 1:len1 
-        for j in 1:len2
-            box = qregion1.boxes[i] ∩ qregion2.boxes[j] 
-            inter[i,j] = box
-        end 
-    end 
-    return inter
-end
 
 function is_intersect(qregion1::QRegion, qregion2::QRegion)::Bool 
     for i in eachindex(qregion1.boxes)
@@ -224,7 +214,6 @@ function is_intersect(qregion1::QRegion, qregion2::QRegion)::Bool
     return false
 end
 
-# TODO : do we need merge?
 function difference(qregion1::QRegion, qregion2::QRegion)::QRegion #TODO: make cleaner? improve by ordering (N^2 -> N log N)
     for i in eachindex(qregion2.boxes)
         boxes1_new = Vector{Box}()
@@ -471,8 +460,6 @@ end
 
 (qn::QN ⊂ qregion_vector::Vector{QRegion}) = contained(qn, qregion_vector)
 
-#TODO: does this definition of belongto make sense? It's used in e.g. combiner_compare but could 
-#use something else if not needed
 function interior(qregion_sub::QRegion, qregion_vector::Vector{QRegion})::Union{Nothing,QRegion}
     for i in eachindex(qregion_vector)
         qregion = qregion_vector[i]
@@ -494,6 +481,22 @@ function contained(qregion_sub::QRegion, qregion_vector::Vector{QRegion})::Union
 end
 
 (qregion_sub::QRegion ⊂ qregion_vector::Vector{QRegion}) = contained(qregion_sub, qregion_vector)
+
+function (∩)(::Any, ::Nothing)::Nothing
+    return nothing
+end
+
+function (∩)(::Nothing, ::Any)::Nothing
+    return nothing
+end
+
+function (-)(A::Any, ::Nothing)
+    return A
+end
+
+function (-)(::Nothing, A::Any)
+    return -A
+end
 
 function Base.show(io::IO, qregion::QRegion)
     print(io, "QRegion([")
